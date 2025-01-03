@@ -15,7 +15,6 @@ const Login = () => {
       });
 
       if (response.data.access_token) {
-        // Set the access token (and optionally refresh token) in cookies
         document.cookie = `access_token=${response.data.access_token}; path=/; HttpOnly; Secure`;
         if (response.data.refresh_token) {
           document.cookie = `refresh_token=${response.data.refresh_token}; path=/; HttpOnly; Secure`;
