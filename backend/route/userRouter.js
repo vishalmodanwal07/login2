@@ -1,8 +1,13 @@
+// route/userRouter.js
 import { Router } from "express";
-import { registerUser , loginUser , logoutUser  } from "../controllers/userControllers.js";
+import { registerUser, loginUser, logoutUser, refreshTokenHandler } from "../controllers/userControllers.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
+
 const router = Router();
 
-router.route("/signup").post(registerUser)
-router.route("/login").post(loginUser)
-router.route("/logout").post(logoutUser);
+router.post("/signup", registerUser);
+router.post("/login", loginUser);
+router.post("/logout", authMiddleware, logoutUser);
+router.post("/refresh-token", refreshTokenHandler);
+
 export default router;
