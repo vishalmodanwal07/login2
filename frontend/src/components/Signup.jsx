@@ -1,19 +1,34 @@
-// src/Signup.js
-import React, { useState } from "react";
 
-const Signup = () =>{
+import  { useState } from "react";
+import axios from "axios";
+
+const Signup = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("/api/user/signup", { // Proxy will handle the full URL
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    const data = await response.json();
-    alert(data.message);
+    try {
+      const response = await axios.post("/api/user/signup", formData, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true, 
+      });
+
+      if (response.data.access_token) {
+      
+        document.cookie = `access_token=${response.data.access_token}; path=/; HttpOnly; Secure`;
+        if (response.data.refresh_token) {
+          document.cookie = `refresh_token=${response.data.refresh_token}; path=/; HttpOnly; Secure`;
+        }
+
+        alert("Signup successful! You are now logged in.");
+      } else {
+        alert("Signup failed: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert("Signup failed. Please try again.");
+    }
   };
 
   return (

@@ -1,5 +1,6 @@
-// src/Login.js
-import React, { useState } from "react";
+// src/components/Login.js
+import { useState } from "react";
+import axios from "axios";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -7,12 +8,27 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("/api/user/login", {
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    const data = await response.json();
-    alert(data.message);
+    try {
+      const response = await axios.post("/api/user/login", formData, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true, // Include cookies
+      });
+
+      if (response.data.access_token) {
+        // Set the access token (and optionally refresh token) in cookies
+        document.cookie = `access_token=${response.data.access_token}; path=/; HttpOnly; Secure`;
+        if (response.data.refresh_token) {
+          document.cookie = `refresh_token=${response.data.refresh_token}; path=/; HttpOnly; Secure`;
+        }
+
+        alert("Login successful!");
+      } else {
+        alert("Login failed: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      alert("Login failed. Please try again.");
+    }
   };
 
   return (
